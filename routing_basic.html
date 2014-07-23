@@ -3,50 +3,16 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=yes" />
     <style type="text/css">
-      html { height: 150% ; width: 98%; margin:10px }
-      body { height: 150%;width: 98%; margin: 10px;}
-      #map-canvas { height: 50%; width: 55%; float:right; opacity: 0.97;border: 6px solid white;}
+      html { height: 160% ; width: 98%; margin:10px }
+      body { height: 160%;width: 98%; margin: 10px;}
+      #map-canvas { height: 100%; width: 65%; opacity: 0.97;margin-left:auto; margin-right:auto; float: auto; border: 6px solid white}
     </style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places">
     </script>
     
-    <script type="text/javascript">
-      var locations = [];
-      var map;
-      
-      function initialize() {
-        var mapOptions = {
-          center: new google.maps.LatLng(37.7831,-122.4039),
-          zoom: 12,
-          mapTypeId: google.maps.MapTypeId.TERRAIN
-        };
-
-        map = new google.maps.Map(document.getElementById("map-canvas"),
-            mapOptions);
-        var acOptions = {
-           types: []
-        };
-
-        for(i = 0; i < 9; i++)
-          locations[i] = new google.maps.places.Autocomplete(document.getElementById("autocomplete"+i),acOptions);     
-      }     
-      google.maps.event.addDomListener(window, 'load', initialize);
-      
-      function GenerateAddressList(){
-        var list=[];
-        for(i = 0; i < locations.size(); i++)
-          var abc;
-      }
-      
-      function DrawOptimalPath() {
-        alert('Im currently working on hooking up the model to this view!Please visit back shortly!!');
-        var distMatReq = {
-          durationInTraffic: true,
-          
-        };
-        
-      }
+    <script type="text/javascript"
+      src = "./commuter.js">
       //other color #B0CEFF
     </script>
   </head>
@@ -54,18 +20,16 @@
  
  
   <body  background="krakow.jpg" bgproperties="fixed">
-    <div id="map-canvas"></div>
-    <div id = "info"  style="height: 49%; width: 38%;; text-align:justified; margin: 20px;">
-      <big><div style="height: 15%; width: 100%; padding: 10px; background-color: #99B3CC;opacity: 0.98;border: 6px solid white;"><h1 style="text-align:center;">Optimal Route</h1></big>
+  	<div id = "info"  style="height: 50%; width: 40%;; text-align:center; margin-left:auto; margin-right:auto;">
+			<div style="height: 12%; width: 100%; padding: 10px; background-color: #99B3CC;opacity: 0.98;border: 6px solid white;overflow: scroll">
+				<big><big><big>Optimal Route</big></big></big><br>
       Have lots of places to visit today? Not sure what the ideal order to visit them in to minimize travel time?
       Enter the places in the boxes below along with the number of hours you plan on spending at each place and this 
       tool will calculate the optimal route for you!!
       </div>
-      <div style="height:6.5%; width: 100%"></div>
-      <div id = "indiv-steps"></div>
-      <div style="height:6%; width: 100%"></div>
+      <div style="height:8%; width: 100%"></div>
     
-      <div style="height: 70%; width: 100%; padding: 10px; background-color: #99B3CC;text-align: center; opacity: 0.98;border: 6px solid white;">
+      <div style="height: 70%; width: 100%; padding: 10px; background-color: #99B3CC;text-align: center; opacity: 0.98;border: 6px solid white;overflow: scroll">
          <big><big>Enter Details Below:</big></big><br><br>
          Start Address:<br>
          <input id="autocomplete0" type="text" style="width: 60%">   Time:&nbsp<input name = "stime" type="time" style="width: 15%"><br><br>
@@ -91,6 +55,9 @@
          <button type="submit" onclick=DrawOptimalPath() style="height: 60px; width: 120px"><big><big>Submit!!</big></big></button>
       </div>
     </div>   
-    
+		<div style="height:50%; width: 95%; margin-left:auto; margin-right:auto;margin-top:auto;">
+      <div id = "indiv-steps" style = "height:0; width: 0;background-color: #99B3CC; overflow: scroll; margin-left:auto; margin-right:auto; float:left" ></div>
+      <div id="map-canvas"></div>
+		</div>
   </body>
 </html>
