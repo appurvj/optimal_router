@@ -43,14 +43,11 @@
          distRow.push(row[j].duration.value);
 			 distMat.push(distRow);
 		 }
-		 console.log(distMat);
      var optOrder = calcOptimalPath(distMat);
 		 renderOnMap(optOrder);
   }
 
   function calcOptimalPath(distMat){
-		 var distMatStr = JSON.stringify(distMat);
-		 console.log(distMatStr);
 		 //TODO
 		 var temp = [];
 		 for(var i = 0; i < addressList.length; i++)
@@ -99,8 +96,57 @@
     };
 
 		var distMatServ = new google.maps.DistanceMatrixService();
-		console.log(distMatServ);
-		distMatServ.getDistanceMatrix(distMatReq,processResponse); 
+		distMatServ.getDistanceMatrix(distMatReq,processResponse);
   }
+
+
+  function TspDyn(distMat, hours, endNode, GRANULARITY){
+	  var N = distMat[0].length - 1;
+	  var optPath;
+	  var C = new Array(N);
+	
+	  for(var i = 0; i < N; i++)
+	    C[i] = new Array(1<<(N-1));
+	  
+	  //Populate Cost Matrix
+	  for(i = 2; i <= N; i++)
+	    C[i-1][1<<(i-2)] = dist[0][i][i];
+	  
+	  var sNew, tempDist;
+	  
+	  for(var nV = 2; nV < N; nV++){
+	    for(var s = (1<<nV)-1; s < 1<<(N-1); s = nextNumSameBitCnt(s)){
+	      for(var k = 2; k <=N; k++){
+					if(s&(1<<(k-2))!=0){
+						C[k-1][s] = Number.MAX_VALUE;
+						sNew = s^(1<<(k-2));
+						for(var l = 2; l <= N; l++)
+							if(sNew&(1<<(l-2))!=0 && (tempDist = C[l-1][sNew]+hours[l-1] + distMat[timeIdx(C[l-1][sNew]+hours[l-1])][l][k])< C[k-1][s])
+								C[k-1][s] = tempDist;
+					}
+					if(C[k-1][s] > 24*3600){//total seconds in a day
+             alert("total commute duration exceeds 24 hrs");
+						 return undefined;
+					}
+				}
+			}
+		}
+
+		//Calculate optimal Path
+		optPath = new Array(N);
+		optpath[0] = 0;
+		var vIdx = N-1;
+		
+	  
+	  function timeIdx(seconds){
+	    return Math.floor(timeIdx/GRANULARITY) + 1;
+	  }	
+	
+		function nextNumSameBitCnt(x){
+	    var setHigherBit = x + x&(-x);
+			return setHigherBit|((x^setHigherBit)/(x&(-x)))>>2;
+		}  
+  }
+
 //}
 
