@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=yes" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
       html { height: 160% ; width: 98%; margin:10px }
       body { height: 160%;width: 98%; margin: 10px;}
@@ -36,26 +36,26 @@
          
          <br><big> Intermediate Locations:</big><br><br>
          
-         Location 1:<br>
+ 
          <input id="autocomplete1" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         Location 2:<br>
+         
          <input id="autocomplete2" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         Location 3:<br>
+         
          <input id="autocomplete3" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         Location 4:<br>
+         
          <input id="autocomplete4" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         Location 5:<br>
+         
          <input id="autocomplete5" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         Location 6:<br>
+         
          <input id="autocomplete6" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         Location 7:<br>
+         
          <input id="autocomplete7" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         Location 8:<br>
+         
          <input id="autocomplete8" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         <button type="submit" onclick=DrawOptimalPath() style="height: 60px; width: 120px"><big><big>Submit!!</big></big></button>
+         <a href = "#result-area"><button name = "submit-button"  type="button" onclick=DrawOptimalPath() style="height: 60px; width: 120px"><big><big>Submit!!</big></big></button></a>
       </div>
     </div>   
-		<div style="height:50%; width: 95%; margin-left:auto; margin-right:auto;margin-top:auto;">
+		<div id = "result-area" style="height:50%; width: 95%; margin-left:auto; margin-right:auto;margin-top:auto;">
       <div id = "indiv-steps" style = "height:0; width: 0;background-color: #99B3CC; overflow: scroll; margin-left:auto; margin-right:auto; float:left" ></div>
       <div id="map-canvas"></div>
 		</div>

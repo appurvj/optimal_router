@@ -100,7 +100,7 @@
 
 		var distMatServ = new google.maps.DistanceMatrixService();
 		console.log(distMatServ);
-		distMatServ.getDistanceMatrix(distMatReq,processResponse);
+		distMatServ.getDistanceMatrix(distMatReq,processResponse); 
   }
 //}
 
