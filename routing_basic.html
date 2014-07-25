@@ -5,7 +5,7 @@
     <style type="text/css">
       html { height: 160% ; width: 98%; margin:10px }
       body { height: 160%;width: 98%; margin: 10px;}
-      #map-canvas { height: 100%; width: 65%; opacity: 0.97;margin-left:auto; margin-right:auto; float: auto; border: 6px solid white}
+      #map-canvas { height: 100%; width: 68%;margin-left:auto; margin-right:auto; float: auto; border: 6px solid white}
     </style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places">
@@ -52,10 +52,11 @@
          <input id="autocomplete7" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
          
          <input id="autocomplete8" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         <a href = "#result-area"><button name = "submit-button"  type="button" onclick=DrawOptimalPath() style="height: 60px; width: 120px"><big><big>Submit!!</big></big></button></a>
+         <a href = "#result-area"><button id = "submit-button"  type="button" onclick=DrawOptimalPath() style="height: 60px; width: 120px"><big><big>SUBMIT!!</big></big></button></a>
+         <br><br><br><a href = "#result-area"><button id = "demo"  type="button" onclick=ShowDemo() style="height: 60px; width: 120px"><big><big>DEMO</big></big></button></a>
       </div>
     </div>   
-		<div id = "result-area" style="height:50%; width: 95%; margin-left:auto; margin-right:auto;margin-top:auto;">
+		<div id = "result-area" style="height:40%; width: 95%; margin-left:auto; margin-right:auto;margin-top:auto;opacity: 0.97">
       <div id = "indiv-steps" style = "height:0; width: 0;background-color: #99B3CC; overflow: scroll; margin-left:auto; margin-right:auto; float:left" ></div>
       <div id="map-canvas"></div>
 		</div>

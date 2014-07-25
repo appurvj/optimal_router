@@ -6,10 +6,13 @@
   var mapOptions = {
     center: new google.maps.LatLng(37.7831,-122.4039),
     zoom: 12,
-    mapTypeId: google.maps.MapTypeId.TERRAIN
+    mapTypeId: google.maps.MapTypeId.TERRAIN,
+    scrollwheel: false
   }; 
   google.maps.event.addDomListener(window, 'load', initialize);
   
+
+
 	
 	function initialize() {
     mapObj = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
@@ -20,7 +23,9 @@
     for(var i = 0; i < 9; i++)
       locations[i] = new google.maps.places.Autocomplete(document.getElementById("autocomplete"+i),acOptions);     
   }     
-  
+ 
+
+
   
   function GenerateAddressList(){
     var list=[];
@@ -32,6 +37,8 @@
 		}
 		return list;
   }
+
+
 
 
   function processResponse(response, stat){
@@ -47,6 +54,8 @@
 		 renderOnMap(optOrder);
   }
 
+
+
   function calcOptimalPath(distMat){
 		 //TODO
 		 var temp = [];
@@ -54,6 +63,8 @@
 			 temp.push(i);
 		 return temp;
 	}
+
+
 
   function renderOnMap(optPath){
 		document.getElementById("indiv-steps").style.height="100%";
@@ -86,6 +97,8 @@
 		);
 	}
   
+
+
   function DrawOptimalPath() {
     mapObj = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 		addressList = GenerateAddressList();
@@ -98,6 +111,25 @@
 		var distMatServ = new google.maps.DistanceMatrixService();
 		distMatServ.getDistanceMatrix(distMatReq,processResponse);
   }
+
+  function ShowDemo(){
+    mapObj = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+    addressList = [];
+    addressList.push("150 Piccadilly, London, United Kingdom ");
+    addressList.push("20 Deans Yd, London, United Kingdom");
+    addressList.push("Trafalgar Square, London, United Kingdom");
+    addressList.push("King William St, United Kingdom");
+    addressList.push("Riverside Bldg, County Hall, Westminster Bridge Rd, London, United Kingdom");
+    var distMatReq = {
+      travelMode: google.maps.TravelMode.DRIVING,
+      origins: addressList,
+      destinations: addressList
+    };
+
+		var distMatServ = new google.maps.DistanceMatrixService();
+		distMatServ.getDistanceMatrix(distMatReq,processResponse);
+  }
+
 
 
   function TspDyn(distMat, hours, endNode, GRANULARITY){
@@ -133,9 +165,36 @@
 		}
 
 		//Calculate optimal Path
+		//TODO: need to ensure that the path sent is base 0
 		optPath = new Array(N);
-		optpath[0] = 0;
-		var vIdx = N-1;
+		optpath[0] = 1;
+		var currS = (1<<(N-1)) - 1;
+		var vIdx = N-1, prevV = 0;
+		
+    if(endNode > 0){
+      optPath[vIdx--] = endNode+1;
+      currS^=1<<(endNode-1);
+    }
+		else if(endNode==0)
+      prevV = optPath[vIdx+1] = 1;
+		
+    var currMin, temp;
+    while(vIdx > 0){
+      currMin = Number.MAX_VALUE;
+      for(var k = 2; k <=N; k++){
+        if((currS&(1<<(k-2)))!=0 && (temp = C[k-1][currS] + hours[k-1] + distMat[timeIdx(C[k-1][currS] + hours[k-1])][k][prevV])< currMin){
+          currMin = temp;
+          optPath[vIdx] = k;
+        }
+      }
+      prevV = optPath[vIdx]; //need to do this assignment outside loop since the if stmt depends on prevV
+      currS^=1<<(prevV-2);
+      vIdx--;
+    }
+    for(var i = 0; i < optPath.length; i++)
+      optPath[i]--;
+    alert(optPath);
+    return optPath;
 		
 	  
 	  function timeIdx(seconds){
