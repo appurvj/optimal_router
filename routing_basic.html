@@ -1,64 +1,211 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
-  <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <style type="text/css">
-      html { height: 160% ; width: 98%; margin:10px }
-      body { height: 160%;width: 98%; margin: 10px;}
-      #map-canvas { height: 100%; width: 68%;margin-left:auto; margin-right:auto; float: auto; border: 6px solid white}
-    </style>
-    <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places">
-    </script>
-    
-    <script type="text/javascript"
-      src = "./commuter.js">
-      //other color #B0CEFF
-    </script>
-  </head>
- 
- 
- 
-  <body  background="krakow.jpg" bgproperties="fixed">
-  	<div id = "info"  style="height: 50%; width: 40%;; text-align:center; margin-left:auto; margin-right:auto;">
-			<div style="height: 12%; width: 100%; padding: 10px; background-color: #99B3CC;opacity: 0.98;border: 6px solid white;overflow: scroll">
-				<big><big><big>Optimal Route</big></big></big><br>
-      Have lots of places to visit today? Not sure what the ideal order to visit them in to minimize travel time?
-      Enter the places in the boxes below along with the number of hours you plan on spending at each place and this 
-      tool will calculate the optimal route for you!!
-      </div>
-      <div style="height:8%; width: 100%"></div>
-    
-      <div style="height: 70%; width: 100%; padding: 10px; background-color: #99B3CC;text-align: center; opacity: 0.98;border: 6px solid white;overflow: scroll">
-         <big><big>Enter Details Below:</big></big><br><br>
-         Start Address:<br>
-         <input id="autocomplete0" type="text" style="width: 60%">   Time:&nbsp<input name = "stime" type="time" style="width: 15%"><br><br>
-         
-         <br><big> Intermediate Locations:</big><br><br>
-         
- 
-         <input id="autocomplete1" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         
-         <input id="autocomplete2" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         
-         <input id="autocomplete3" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         
-         <input id="autocomplete4" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         
-         <input id="autocomplete5" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         
-         <input id="autocomplete6" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         
-         <input id="autocomplete7" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         
-         <input id="autocomplete8" type="text" style="width: 60%">   Hours:&nbsp<input name="y" type = "text" style="width: 7%"><br><br>
-         <a href = "#result-area"><button id = "submit-button"  type="button" onclick=DrawOptimalPath() style="height: 60px; width: 120px"><big><big>SUBMIT!!</big></big></button></a>
-         <br><br><br><a href = "#result-area"><button id = "demo"  type="button" onclick=ShowDemo() style="height: 60px; width: 120px"><big><big>DEMO</big></big></button></a>
-      </div>
-    </div>   
-		<div id = "result-area" style="height:40%; width: 95%; margin-left:auto; margin-right:auto;margin-top:auto;opacity: 0.97">
-      <div id = "indiv-steps" style = "height:0; width: 0;background-color: #99B3CC; overflow: scroll; margin-left:auto; margin-right:auto; float:left" ></div>
-      <div id="map-canvas"></div>
-		</div>
-  </body>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<head>
+    	
+		<link type="text/css" rel="stylesheet" href="http://cdn.jsdelivr.net/toastr/2.0.1/toastr.css"><link>
+		<link type="text/css" rel="stylesheet" href="jQuery.ptTimeSelect/src/jquery.ptTimeSelect.css"><link>
+		<link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.css" media = "screen"></link>
+		<script src="./jquery-2.1.1.min.js"></script>
+    	<style>
+      		#map-canvas img { 
+        		max-width: none;
+      		}
+
+      		#map-canvas label { 
+        		width: auto; display:inline; 
+      		} 
+      
+      		#indiv-steps{
+        		overflow:scroll ;
+        		background-color: #FAF5E6;
+      		}
+      		#indiv-steps img { 
+        		max-width: none;
+      		}
+
+      		#indiv-steps label { 
+        		width: auto; display:inline; 
+      		} 
+    	</style>
+	</head>
 </html>
+
+<body class="text-center" background="krakow.jpg" bgproperties="fixed" style="background-size:cover">
+
+
+	<!-- To show/hide modal $('#myModal').modal('show/hide') -->
+	<div class="well modal fade" id="myModal" >
+	    <div class="modal-dialog">
+        	<div class="modal-content" style = "color:orange;background-color:#1A1A1A;">
+        	
+				<div class="modal-header">
+					<h2 class="modal-title">Working on it!!</h2>
+				</div>
+				
+				<div class="modal-body">
+					<img src = "spiral.gif" style="max-height: 40%; display: block; margin-left: auto; margin-right: auto;" ></img><br>
+					<div class="progress">
+  						<div id="prog-bar" class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+    						<!--  To change progress width using jquery: $('#prog-bar').width("x%")  -->
+  						</div>
+					</div>
+				</div>
+					
+				<div class = "modal-footer" style="text-align:center">
+					It takes a little more time to obtain transit data from servers..<br>
+					Hold on for just a few seconds..<br>
+					Note: The optimization for transit path has not been implemented yet. 
+					That is currently being worked on
+				</div> 				
+ 			</div>
+ 		</div>
+	</div>
+
+	<div class="well" style="color:orange;background-image: url(header_back_small.png);background-size:cover">
+  		<h4><big><big>Logistics Planner</big></big> - A simple tool to help manage travel logistics for the day</h4>
+  		<p>
+  			<button class="btn btn-primary" data-toggle = "modal" data-target="#infoModal" title="Click for Overview">
+  				Learn more
+  			</button> 
+  			<button class="btn btn-warning" onclick=ShowDemo()>
+  				Sample Input
+  			</button>
+  		</p>			
+	</div>
+	
+	<div id="message-disp" class="alert alert-warning alert-dismissible" role="alert">
+		<strong>Press the sample button and then hit "Route It!!"</strong>
+	</div>
+	
+	<div id="infoModal" class="well modal fade"  >
+		<div class="modal-dialog">
+			<div class="modal-content" style = "color:orange; background-color:#101010;opacity:0.8">
+				
+				<div class="modal-header">
+					<h3 class="modal-title">Overview</h3>
+				</div>
+				
+				<div class="modal-body">
+				    This tool can be used to figure out the best route when there are multiple points to visit in the day.<br> 
+					A good application of this tool is while travelling.<br><br>
+					
+					For any trip, business or liesure, this tool will help get an understanding of the most optimal path to take in terms of 
+					travel time.
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+				
+			</div>
+		</div>
+	</div>  
+
+
+	<!-- Main body where the input area and steps divs lie -->
+	
+	<div class="container-fluid col-md-12 col-xs-18" >
+		<div class="row-fluid">
+			<!-- The entire non-map side. For taking input and displaying written directions -->
+			<div id="input-area" class = "well col-md-5 col-xs-18" >
+				
+				<!--  This div is for the button in the top -->
+				<div class="row-fluid">
+					<div class="col-md-8 col-xs-18">         
+          		    	<div id="mode" class="btn-group btn-group-justified" data-toggle="buttons">
+          		    		<label class = "btn btn-primary" onclick=activateMode("DRIVING")>
+            	    			<input type="radio">Drive</input>
+            	    		</label>
+          		    		<label class = "btn btn-primary"  onclick=activateMode("WALKING")>
+            	    			<input type="radio">Walk</input>
+            	    		</label>
+          		    		<label class = "btn btn-primary" onclick=activateMode("BICYCLING")>
+            	    			<input type="radio">Bike</input>
+            	    		</label>
+          		    		<label class = "btn btn-primary active"  onclick=activateMode("TRANSIT")>
+            	    			<input type="radio">Transit</input>
+            	    		</label>
+          				</div>	
+        			</div>
+        		  
+        		  	<div class="col-md-4 col-xs-18">
+        		  		<button id="route-btn" class="btn btn-success btn-group-justified" onclick=onSubmit()>Route It!!</button><br>
+        			</div>
+        		</div><br><br>
+        		
+        		<!--  This area will be used to display the steps of the route after
+        		      collapsing the row below  -->
+        		<div id = "indiv-steps" class="well row-fluid">
+        		</div>
+        		
+        		<!-- this div segregates the addresses and hours. This is a different row from the above row -->
+				<div id = "collapsible-area" class="row-fluid"> 
+				
+					<!--  This div deals with address area  -->
+					<div id="addrs-info" class = "col-md-8 col-xs-7">
+					  <div class = "well col-md-12 col-xs-18">
+					    <label style="color:white">Start Location (Home Base)</label><br>
+					    <input name="autocomp" id="autocomplete0" class="col-md-12 col-xs-18" type="text"></input>
+					  </div>
+					  
+					  <div class = "well col-md-12 col-xs-18">
+					    <label style="color:white">Intermediate Locations</label><br>
+					    <input name="autocomp" id="autocomplete1" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					    <input name="autocomp" id="autocomplete2" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					    <input name="autocomp" id="autocomplete3" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					    <input name="autocomp" id="autocomplete4" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					    <input name="autocomp" id="autocomplete5" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					    <input name="autocomp" id="autocomplete6" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					    <input name="autocomp" id="autocomplete7" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					    <input name="autocomp" id="autocomplete8" class="col-md-12 col-xs-18" type="text"></input><br><br>
+					  </div>
+					</div>
+					
+					<!--  This div deal with taking timing info in case of the transit option  -->
+					<div id = "time-info" class = "col-md-4 col-xs-5">
+						<div class = "well col-md-12 col-xs-18">
+					    	<label style="color:white">Start Time</label><br>
+					    	<input id = "stime" class="col-md-12 col-xs-18" value=""></input>
+					    	<script type="text/javascript">
+						    	$(document).ready(function(){
+        							$('#stime').ptTimeSelect();
+    							});
+    						</script>
+					  	</div>
+					  	
+						<div class = "well col-md-12 col-xs-18">						     
+					    	<label style="color:white">Hours</label><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					    	<input name="trans-opts" class="col-md-offset-3 col-md-6 col-xs-8" type="text"></input><br><br>
+					  	</div>
+					</div>
+				</div>
+				
+				
+			</div><!--  End of the left side  -->
+
+			<!-- To the right of the input display area -->
+			<div id="map-canvas" class = "well col-md-7 col-xs-18">
+			</div>
+		</div>
+	</div>
+
+
+
+    
+	<script src="bootstrap/js/bootstrap.js"></script> 
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDjICNLUMlM3ftvW3BJ7jjUXPX2iTr_CRk&sensor=false&libraries=places,weather"></script>
+	<script src="http://cdn.jsdelivr.net/toastr/2.0.1/toastr.js"></script>
+	<script src="./globalStuff.js"></script>
+	<script src = "./Transit.js"></script>
+	<script src = "./commuter.js">  //other color #99B3CC #B0CEFF  #33CCFF #EBEBE4 #EBEBE4 </script>
+	<script src = "jQuery.ptTimeSelect/src/jquery.ptTimeSelect.js "></script>
+
+</body>

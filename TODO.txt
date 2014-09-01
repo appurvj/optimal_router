@@ -1,0 +1,11 @@
+- Work on reducing dependency on Autocomplete class. Use it just to assist user but use the prediction service other autocomplete services for the actual work under the hood(move to taking user input from the html element instead of the autocomplete object)
+
+- Work on managing the value of the markers. May eventually need to move the rendering by oneself instead of using the DirectionsRenderer service. Another possibility is to have the markers invisible and place own markers at the latlang positions with more information embedded in them using marker options objects!!!
+
+- Try to find some way to give the user more flexibility in choosing to walk certain legs or taking a cab for certain legs
+
+- Add functionality to to have relevant weather information available
+
+- Also add functionality to have may be google reviews on the places selected
+
+- 

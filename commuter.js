@@ -1,211 +1,161 @@
-//function commute(){
-  var locations = [];
-  var mapObj;
-	var addressList;
-	var dirService;
-  var mapOptions = {
-    center: new google.maps.LatLng(37.7831,-122.4039),
-    zoom: 12,
-    mapTypeId: google.maps.MapTypeId.TERRAIN,
-    scrollwheel: false
-  }; 
-  google.maps.event.addDomListener(window, 'load', initialize);
-  
 
+function calcOptimalPath(){
+	//TODO
+	var temp = [];
+	for(var i = 0; i < addressList.length; i++)
+		temp.push(i);
+    temp.push(0);
+	return temp;
+}
 
-	
-	function initialize() {
-    mapObj = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-    var acOptions = {
-       types: []
-    };
-
-    for(var i = 0; i < 9; i++)
-      locations[i] = new google.maps.places.Autocomplete(document.getElementById("autocomplete"+i),acOptions);     
-  }     
- 
-
-
-  
-  function GenerateAddressList(){
-    var list=[];
-		for(var i = 0; i < locations.length; i++){
-			if(locations[i].getPlace()!= undefined){
-				console.log("Adding: " + locations[i].getPlace().formatted_address)
-				list.push(locations[i].getPlace().formatted_address);
-			}
-		}
-		return list;
-  }
-
-
-
-
-  function processResponse(response, stat){
-     var distMat = [];
-		 for(var i = 0; i < addressList.length; i++){
-       var distRow = [];
-		   var row = response.rows[i].elements;
-			 for(var j = 0; j < row.length; j++)
-         distRow.push(row[j].duration.value);
-			 distMat.push(distRow);
-		 }
-     var optOrder = calcOptimalPath(distMat);
-		 renderOnMap(optOrder);
-  }
-
-
-
-  function calcOptimalPath(distMat){
-		 //TODO
-		 var temp = [];
-		 for(var i = 0; i < addressList.length; i++)
-			 temp.push(i);
-		 return temp;
+function onSubmit(){
+    $('#message-disp').hide();
+	if(inputCollapsed){
+    	submittedOnce = false;
+		$('#indiv-steps').hide();
+		$('#collapsible-area').show();
+		inputCollapsed = false;
+		$('#map-canvas').height($('#input-area').height());
+		$('#route-btn').removeClass('btn-warning').addClass('btn-success').html('Route It!!');
+	}else{
+		runCalc();
+		
 	}
+	$('#map-canvas').height($('#input-area').height());
+	google.maps.event.trigger(mapObj, 'resize');
+}
 
+function runCalc(){
+	if(!prepGlobalVars())
+		return;
+	submittedOnce = true;
+	dirRender.setMap(null);
+	dirRender.setPanel(null);
+	if(addressList.length < 2){
+    	alert("Atleast two addresses needed...Click 'Sample Input' for sample input..")
+		return;
+	}
+    if(travelmode == "TRANSIT")
+    	transit.tryPath(calcOptimalPath());
+    else
+    	renderOnMap(calcOptimalPath());
 
+	$('#collapsible-area').hide();
+	$('#indiv-steps').show();
+	inputCollapsed = true;
+    $('#map-canvas').focus();  
+    $('#route-btn').removeClass('btn-success').addClass('btn-warning').html('Edit Route Info');
+}
 
+  
+  
   function renderOnMap(optPath){
-		document.getElementById("indiv-steps").style.height="100%";
-		document.getElementById("indiv-steps").style.width="30%";
-    document.getElementById("indiv-steps").style.border = "6px solid white";
     dirService = new google.maps.DirectionsService();
 		var wayPointList = [];
-		for(var i = 1; i < optPath.length; i++){
+		for(var i = 1; i < optPath.length-1; i++){
       wayPointList.push({
 			  location: addressList[optPath[i]],
 				stopover: true
 			});
 		}
-		dirService.route({
+    var directionsRequest = {
 			  origin: addressList[optPath[0]],
-			  destination: addressList[optPath[0]],
+			  destination: addressList[optPath[optPath.length-1]],
 			  durationInTraffic: true,
 			  optimizeWaypoints: true,
 			  waypoints: wayPointList,
-        travelMode: google.maps.TravelMode.DRIVING
-		  },
+        	  travelMode: travelmode
+		  };
+
+		dirService.route(directionsRequest,
 		  function(result, stat){
-		    var dirRender = new google.maps.DirectionsRenderer({
-				  directions: result,
-				  draggable: false,
-				  map: mapObj,
-				  panel:document.getElementById("indiv-steps")
+				dirRender.setOptions({
+				  	directions: result,
+					draggable: false,
+          			map: mapObj,
+				  //suppressMarkers: true,
+				  //markerOptions: {visible: false},
+					panel: document.getElementById("indiv-steps")
 				});
-		  }
-		);
-	}
+				//testRes = result.routes[0].legs[0].start_location;
+				//home = new google.maps.Marker({map: mapObj,icon:"A", position: result.routes[0].legs[0].start_location, zIndex:100, visible:true});
+		  });
+	} 
   
 
-
   function DrawOptimalPath() {
-    mapObj = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-		addressList = GenerateAddressList();
+		prepGlobalVars();
+		if(addressList.length <= 0){
+      alert("No Usable Addresses Entered!!");
+			return;
+		}
     var distMatReq = {
-      travelMode: google.maps.TravelMode.DRIVING,
+      travelMode: travelmode,
 			origins: addressList,
 			destinations: addressList
     };
-
-		var distMatServ = new google.maps.DistanceMatrixService();
-		distMatServ.getDistanceMatrix(distMatReq,processResponse);
+    renderOnMap(calcOptimalPath);
+		window.location = document.getElementById("go-to-result").href;
   }
+
+  function prepGlobalVars(){
+    if(selectedMode == "TRANSIT"){
+      sTime = GetDate();
+      if(sTime == null){
+      	return false;
+      }
+      hoursList = GetHours();
+      currProgBar = 0;
+      progBarUnit = 100/hoursList.length
+	}
+    addressList = GetAddressList();	
+    return true;
+  }
+
+
+
+
+  //TODO: Break the demo part into a seperate file
+  function prepForDemo(){
+    var addrs = [];
+		var hrs = [1.2, 0.8, 1.5, 2];
+    addrs.push("150 Piccadilly, London, United Kingdom ");
+    addrs.push("Big Ben, London, United Kingdom");
+    addrs.push("Westminster Abbey, London, United Kingdom");
+    addrs.push("London Bridge, King William Street, City of London, United Kingdom");
+    addrs.push("London Eye, Westminster Bridge Road, London, United Kingdom`");
+    var addrIp = $('[name="autocomp"]');
+    var hoursIp = $('[name="trans-opts"]');
+    
+    for(var idx = 0; idx < addrs.length; idx++){
+      addrIp[idx].value = addrs[idx]
+      if(idx < hrs.length) hoursIp[idx].value = hrs[idx];
+    }
+    $("#stime").val("09:00 AM");
+    /*
+		return {
+			addr: addressList,
+			//latLang: latLangList,
+			hrs: hoursList,
+			start: "09:00",
+			travelMode: google.maps.TravelMode.TRANSIT,
+			endNode: 0 //-1 means no end node specified
+		};
+    */
+	}
+
 
   function ShowDemo(){
-    mapObj = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-    addressList = [];
-    addressList.push("150 Piccadilly, London, United Kingdom ");
-    addressList.push("20 Deans Yd, London, United Kingdom");
-    addressList.push("Trafalgar Square, London, United Kingdom");
-    addressList.push("King William St, United Kingdom");
-    addressList.push("Riverside Bldg, County Hall, Westminster Bridge Rd, London, United Kingdom");
-    var distMatReq = {
-      travelMode: google.maps.TravelMode.DRIVING,
-      origins: addressList,
-      destinations: addressList
-    };
+     prepForDemo();
+     $("#autocomplete0").focus();
+     //var dn = $.Event("keypress", {keycode: 40, which: 40});
+     //var ent = $.Event("keypress", {keycode: 13, which: 13});
+     //$('#autocomplete0').trigger(dn).trigger(ent);
+     jQuery.event.trigger({ type : 'keypress', which : 40});
+     jQuery.event.trigger({ type : 'keypress', which : 13});
+	 //onSubmit();
+	 toastr["info"]("<h3>Hit the Route button!!!</h3>");
 
-		var distMatServ = new google.maps.DistanceMatrixService();
-		distMatServ.getDistanceMatrix(distMatReq,processResponse);
   }
 
-
-
-  function TspDyn(distMat, hours, endNode, GRANULARITY){
-	  var N = distMat[0].length - 1;
-	  var optPath;
-	  var C = new Array(N);
-	
-	  for(var i = 0; i < N; i++)
-	    C[i] = new Array(1<<(N-1));
-	  
-	  //Populate Cost Matrix
-	  for(i = 2; i <= N; i++)
-	    C[i-1][1<<(i-2)] = dist[0][i][i];
-	  
-	  var sNew, tempDist;
-	  
-	  for(var nV = 2; nV < N; nV++){
-	    for(var s = (1<<nV)-1; s < 1<<(N-1); s = nextNumSameBitCnt(s)){
-	      for(var k = 2; k <=N; k++){
-					if(s&(1<<(k-2))!=0){
-						C[k-1][s] = Number.MAX_VALUE;
-						sNew = s^(1<<(k-2));
-						for(var l = 2; l <= N; l++)
-							if(sNew&(1<<(l-2))!=0 && (tempDist = C[l-1][sNew]+hours[l-1] + distMat[timeIdx(C[l-1][sNew]+hours[l-1])][l][k])< C[k-1][s])
-								C[k-1][s] = tempDist;
-					}
-					if(C[k-1][s] > 24*3600){//total seconds in a day
-             alert("total commute duration exceeds 24 hrs");
-						 return undefined;
-					}
-				}
-			}
-		}
-
-		//Calculate optimal Path
-		//TODO: need to ensure that the path sent is base 0
-		optPath = new Array(N);
-		optpath[0] = 1;
-		var currS = (1<<(N-1)) - 1;
-		var vIdx = N-1, prevV = 0;
-		
-    if(endNode > 0){
-      optPath[vIdx--] = endNode+1;
-      currS^=1<<(endNode-1);
-    }
-		else if(endNode==0)
-      prevV = optPath[vIdx+1] = 1;
-		
-    var currMin, temp;
-    while(vIdx > 0){
-      currMin = Number.MAX_VALUE;
-      for(var k = 2; k <=N; k++){
-        if((currS&(1<<(k-2)))!=0 && (temp = C[k-1][currS] + hours[k-1] + distMat[timeIdx(C[k-1][currS] + hours[k-1])][k][prevV])< currMin){
-          currMin = temp;
-          optPath[vIdx] = k;
-        }
-      }
-      prevV = optPath[vIdx]; //need to do this assignment outside loop since the if stmt depends on prevV
-      currS^=1<<(prevV-2);
-      vIdx--;
-    }
-    for(var i = 0; i < optPath.length; i++)
-      optPath[i]--;
-    alert(optPath);
-    return optPath;
-		
-	  
-	  function timeIdx(seconds){
-	    return Math.floor(timeIdx/GRANULARITY) + 1;
-	  }	
-	
-		function nextNumSameBitCnt(x){
-	    var setHigherBit = x + x&(-x);
-			return setHigherBit|((x^setHigherBit)/(x&(-x)))>>2;
-		}  
-  }
-
-//}
 
