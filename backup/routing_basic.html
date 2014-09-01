@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <style type="text/css">
+      html { height: 160% ; width: 98%; margin:10px ;color: orange}
+      body { height: 160%;width: 98%; margin: 10px;color:orange}
+      #map-canvas { height: 100%; width: 68%;margin-left:auto; margin-right:auto; float: auto; border: 6px solid darkgrey}
+    </style>
+  </head>
+ 
+ 
+ 
+  <body  background="krakow.jpg" bgproperties="fixed">
+  	<div class = "container-fluid" id = "info"  style="height: 50%; width: 45%;; text-align:center; margin-left:auto; margin-right:auto;">
+			<div style="height: 15%; width: 100%; padding: 10px; background-color:#373737;;opacity: 0.98;;overflow: scroll">
+				<big><big><big>Optimal Route</big></big></big><br>
+      Have lots of places to visit today? Not sure what the ideal order to visit them in to minimize travel time?
+      Enter the places in the boxes below along with the number of hours you plan on spending at each place and this 
+      tool will calculate the optimal route for you!!
+      </div>
+      <div style="height:8%; width: 100%"></div>
+    
+      <div style="height: 70%; width: 100%; padding: 10px ; background-color:#373737;;text-align: center; opacity: 0.98;;overflow: scroll">
+
+      <button id = "demo"  type="button" class = "btn btn-small btn-warning" style = "float:right" onclick=ShowDemo()>Demo Input</button> 
+         <br><big><big>Enter Details Below:</big></big> <br><br>
+				     <div id="panel">
+                <b>Mode of Travel: </b>
+                <select id="mode" onchange="showHideTimeInfo()" style = "color: black">
+                  <option value="DRIVING">Driving</option>
+                  <option value="WALKING">Walking</option>
+                  <option value="BICYCLING">Bicycling</option>
+                  <option value="TRANSIT">Transit</option>
+								</select><br><br>
+              </div>
+         Start Address (Home Base):<br>
+				 <input name = "autocomp" id="autocomplete0" type="text" style="width: 60%;color: black"> <div name = "timeInfo" style = "width: 30%;float:right">Time:&nbsp <input id = "stime" type="time" style = ";color:black"></div><br><br>
+         
+         <br><big> Intermediate Locations:</big><br><br>
+         
+ 
+				 <input name = "autocomp"  id="autocomplete1" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp <input name="hrs" type = "text" style="width: 20%;color:black"></div><br><br>
+         
+         <input name = "autocomp"  id="autocomplete2" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp <input name="hrs" type = "text" style="width: 20%;color:black"></div><br><br>
+         
+         <input name = "autocomp" id="autocomplete3" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp <input name="hrs" type = "text" style="width: 20%;color:black"></div><br><br>
+         
+         <input name = "autocomp" id="autocomplete4" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp <input name="hrs" type = "text" style="width: 20%;color:black"></div><br><br>
+         
+         <input name = "autocomp" id="autocomplete5" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp <input name="hrs" type = "text" style="width: 20%;color:black"></div><br><br>
+         
+         <input name = "autocomp" id="autocomplete6" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp <input name="hrs" type = "text" style="width: 20%;color:black"></div><br><br>
+         
+         <input name = "autocomp" id="autocomplete7" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp <input name="hrs" type = "text" style="width: 20%;color:black"></div><br><br>
+         
+         <input name = "autocomp" id="autocomplete8" type="text" style="width: 60%;color: black">  <div name = "timeInfo" style = "float:right"> Hours:&nbsp<input name="hrs" type = "text" style="width: 20%"></div><br><br>
+				 <button id = "submit-button" class="btn btn-warning btn-large btn-block" type="button" onclick=onSubmit()>SUBMIT!!</button><br>
+
+      </div>
+    </div>   
+    <a id = "go-to-result" href="#result-area"></a>
+	<div id = "result-area" style="height:40%; width: 95%; margin-left:auto; margin-right:auto;margin-top:auto;opacity: 0.97">
+		  <div id = "load_image" style = "position: absolute; max-height: 40%; max-width: 30%;left:34%;top: 150%; z-index:1; opacity:0.9; visibility: hidden;">
+      <img  src = "spiral.gif" style = "padding: 10px; max-width:100%; max_height;100%"  ></img><br>
+      <div id = "messageArea" style=" background-color:#373737;height: 15%; width: 100%; padding: 10px; ">
+      
+      </div>
+      </div>
+      <div id = "indiv-steps" style = "height:100%; width: 0%;background-color:#FFA319;color:orange; overflow: scroll; margin-left:auto; margin-right:auto; float:left" ></div>
+      <div id="map-canvas"></div>
+		</div>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDjICNLUMlM3ftvW3BJ7jjUXPX2iTr_CRk&sensor=false&libraries=places,weather"></script>
+    <script src="./globalStuff.js"></script>
+		<script src = "./Transit.js"></script>
+    <script src = "./commuter.js">  //other color #99B3CC #B0CEFF #EBEBE4 #EBEBE4 #f5f5f5</script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

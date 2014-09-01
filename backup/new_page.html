@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+
+<html>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <head>
+		<link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.css" media = "screen"></link>
+		<link type="text/css" rel="stylesheet" href="http://cdn.jsdelivr.net/toastr/2.0.1/toastr.css"><link>
+    <style>
+      #map-canvas img { 
+        max-width: none;
+      }
+
+      #map-canvas label { 
+        width: auto; display:inline; 
+      } 
+      
+      #indiv-steps{
+        overflow:scroll ;
+        background-color: #FAF5E6;
+      }
+      #indiv-steps img { 
+        max-width: none;
+      }
+
+      #indiv-steps label { 
+        width: auto; display:inline; 
+      } 
+    </style>
+  </head>
+ 
+<body background="krakow.jpg" bgproperties="fixed" style="background-size:cover">
+
+<div class="modal  fade" id="myModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+&times;</button>
+<h4 class="modal-title">Modal Title Goes Here</h4>
+</div>
+<div class="modal-body">
+<img src = "spiral.gif" style="max-height: 80%; display: block; margin-left: auto; margin-right: auto;" ></img>
+</div>
+</div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div>
+
+
+<div class = "container-fluid text-center"> 
+
+<div class="jumbotron well row-fluid" style="color:orange;background-image: url(header_back_small.png);background-size:cover">
+  <h3><big><big>Logistics Planner</big></big> - A simple tool to manage travel logistics for the day</h3>
+  <p><button class="btn btn-primary" role="button">Learn more</button> <button class="btn btn-warning" onclick=ShowDemo()>Sample Input</button></p>
+</div>
+
+
+  
+  <div id = "map-row" class = "row-fluid">
+  	<!--<div id="left-side" class=" container-fluid span4">-->
+
+  
+      <div id="input-area" class="well col-md-4" style="text-align:center; color:white">	       
+        <div class="span12">         
+          <div id="mode" class="btn-group" data-toggle="buttons">
+            <button id="dr-btn" type="button" onclick=activateMode("DRIVING") class="btn btn-primary">Drive</button>
+            <button type="button" onclick=activateMode("WALKING") class="btn btn-primary">Walk</button>
+            <button type="button" onclick=activateMode("BICYCLING") class="btn btn-primary">Bike</button>
+            <button type="button" onclick=activateMode("TRANSIT") class="btn btn-primary">Transit</button>
+          </div>
+          <button class="btn btn-success offset1 span3" onclick=onSubmit()>Route It!!</button><br><br>
+        </div>
+        <div>
+         <div id="indiv-steps" class= "well span12"></div>
+         <div id="collapsible-area" class="span12">
+  		  <div id="start-details" class="well">
+          <div class="col-md-8 text-centre"><b>Start Location (Home Base)</b></div> <div name="trans" class="span4"><b>Start Time</b></div>
+          <input name="autocomp" id="autocomplete0" class="col-md-8 search-query" type="text"></input> 
+  				    <input id = "stime" name="trans" class="span4 search-query"type="time" ></input>
+        </div>  			 
+          <div id = "intermediate" class= "well">
+          <div class="offset1 col-md-8 text-centre"><b>Intermediate Locations&nbsp(Upto 8)</b></div> <div name="trans" class="col-md-2"><b>Hours</b></div>
+  				<input name="autocomp" id="autocomplete1" class="col-md-8" type="text"></input> 
+  			    	<input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+  				<input name="autocomp" id="autocomplete2" class="col-md-8 " type="text"></input> 
+  		    		<input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+  				<input name="autocomp" id="autocomplete3" class="col-md-8 " type="text"></input> 
+  		    		<input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+  				<input name="autocomp" id="autocomplete4" class="col-md-8 " type="text"></input>  
+  			    	<input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+                <input name="autocomp" id="autocomplete5" class="col-md-8" type="text"></input>  
+  			    	<input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+  
+                <input name="autocomp" id="autocomplete6" class="col-md-8 search-query" type="text"></input>   
+  				    <input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+  
+                <input name="autocomp" id="autocomplete7" class="col-md-8 search-query" type="text"></input>  
+  			    	<input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+  
+                <input name="autocomp" id="autocomplete8" class="col-md-8 search-query" type="text"></input> &nbsp 
+  			    	<input name="trans-opts" class="col-md-2 search-query"type="text" ></input><br><br>
+          </div>    
+        </div> 
+        </div>
+  	  </div>
+   <!--</div>-->
+    <div class="col-md-1">&nbsp</div>
+    <div id="map-canvas" class = "well col-md-7" ></div>
+  </div>   
+</div>    
+
+
+
+<script src="./jquery-2.1.1.min.js"></script>
+<script src="bootstrap/js/bootstrap.js"></script> 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDjICNLUMlM3ftvW3BJ7jjUXPX2iTr_CRk&sensor=false&libraries=places,weather"></script>
+<script src="http://cdn.jsdelivr.net/toastr/2.0.1/toastr.js"></script>
+<script src="./globalStuff.js"></script>
+<script src = "./Transit.js"></script>
+<script src = "./commuter.js">  //other color #99B3CC #B0CEFF  #33CCFF #EBEBE4 #EBEBE4 </script>
+
+    
+
+</body>
+ </html>
